@@ -1,16 +1,45 @@
 ---
+
 - name: Copy {{ pdns_admin_conf_filename }}
   template:
     src: "{{ pdns_admin_conf_template_filename }}"
     dest: "{{ pdns_admin_conf_filepath }}"
     owner: root
     group: root
+    mode: '0644'
   notify: Restart Powerdns Admin Service
   tags:
     - pdns-admin-config
 
-- name: Run Create DB
-  shell: "{{ pdns_admin_python_path }} /var/www/powerdns-admin/create_db.py"
+- name: create app db
+  shell: "flask db upgrade"
+  args:
+    chdir: '/var/www/powerdns-admin'
+  environment:
+    VIRTUAL_ENV: '/opt/venvs/powerdns'
+    PATH: '/opt/venvs/powerdns/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/lib/npm/bin:/usr/local/yarn/bin'
+    FLASK_APP: 'powerdnsadmin/__init__.py'
+    FLASK_CONF: '/var/www/powerdns-admin/configs/production.py'
+
+- name: generate front end assets - yarn
+  shell: "/usr/local/yarn/bin/yarn install --pure-lockfile"
+  args:
+    chdir: '/var/www/powerdns-admin'
+  environment:
+    VIRTUAL_ENV: '/opt/venvs/powerdns'
+    PATH: '/opt/venvs/powerdns/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/lib/npm/bin:/usr/local/yarn/bin'
+    FLASK_CONF: '/var/www/powerdns-admin/configs/production.py'
+    FLASK_APP: 'powerdnsadmin/__init__.py'
+
+- name: generate front end assets - flask
+  shell: "flask assets build"
+  args:
+    chdir: '/var/www/powerdns-admin'
+  environment:
+    VIRTUAL_ENV: '/opt/venvs/powerdns'
+    PATH: '/opt/venvs/powerdns/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/lib/npm/bin:/usr/local/yarn/bin'
+    FLASK_CONF: '/var/www/powerdns-admin/configs/production.py'
+    FLASK_APP: 'powerdnsadmin/__init__.py'
 
 - name: Drop PowerDNS Admin systemd file
   template:

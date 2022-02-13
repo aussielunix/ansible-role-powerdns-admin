@@ -5,7 +5,7 @@
 - name: Install required packages in Redhat derivatives
   yum:
     name: "{{ item }}"
-    state: installed
+    state: present
   with_items:
     - "{{ pdns_admin_packages }}"
   when: ansible_os_family == 'RedHat'
@@ -13,14 +13,11 @@
 - name: Install required packages in Debian derivatives
   apt:
     name: "{{ item }}"
-    state: installed
-    update_cache: yes
+    state: present
+    update_cache: true
   with_items:
     - "{{ pdns_admin_packages }}"
   when: ansible_os_family == 'Debian'
-
-- name: Install Python PIP
-  shell: pip --version || curl https://bootstrap.pypa.io/get-pip.py | python
 
 - name: Create "{{ pdns_admin_root_path }}" directory
   file:
