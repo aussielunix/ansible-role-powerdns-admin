@@ -1,17 +1,21 @@
+---
 galaxy_info:
-  author: Natthaphon Phoonsookserm
-  description: Ansible role to install PowerDNS Admin
+  author: Mick Pollard
+  role_name: aussielunix.powerdns-admin
+  namespace: aussielunix
+  description: Install and configure PowerDNS Admin
   license: MIT
-  min_ansible_version: 2.2
+  company: Contojo
+  min_ansible_version: 3.5.1
+
   platforms:
-  - name: EL
-    versions:
-    - 7
-  - name: Ubuntu
-    versions:
-    - trusty
-    - xenial
+    - name: Ubuntu
+      versions:
+        - focal
+
   galaxy_tags:
+    - dns
     - powerdns
     - powerdns-admin
+
 dependencies: []

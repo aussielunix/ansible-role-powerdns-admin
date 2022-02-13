@@ -1,0 +1,10 @@
+---
+
+- name: assert that some settings have been set correctly
+  ansible.builtin.assert:
+    that:
+      - pdns_api_key is defined
+      - pdns_api_key is string
+      - pdns_api_key != "CHANGEME"
+    quiet: true
+    msg: "pdns_api_key must be set"
